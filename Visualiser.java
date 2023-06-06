@@ -1,7 +1,9 @@
-class Visualiser {
-    Visualiser() {}
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
-    String visualise(ImList<RoomPos> rooms) {
+class Visualiser {
+    static void visualise(ImList<RoomPos> rooms) {
         String output = "";
         for (RoomPos room : rooms) {
             output += room.getId() + " " +
@@ -9,6 +11,14 @@ class Visualiser {
                 room.getPos().second() + " " +
                 room.getX() + " " + room.getY() + "\n";
         }
-        return output;
+        try {
+            File file = new File("output.out");
+            FileWriter fileWriter = new FileWriter(file);
+            file.createNewFile();
+            fileWriter.write(output);
+            fileWriter.close();
+        } catch (IOException e) {
+            System.out.println("could not write output");
+        }
     }
 }

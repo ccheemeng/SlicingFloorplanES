@@ -10,6 +10,7 @@ class Evolver<T> {
     private final Function<Pair<T>, T> crossover;
     private final Function<T, Double> evaluator;
     private static final double EPSILON = 1E-9;
+    private static final double GEN_CAP = 10000;
     private static final int GENS_WITHOUT_IMPROVEMENT = 7500;
     private static final double MUTATION_PROB = 0.9;
 
@@ -71,7 +72,7 @@ class Evolver<T> {
             System.out.println("fitness:" + fitness + ", " +
                     "gen:" + gen + ", " +
                     "gen w/o improve:" + gensWithoutImprovement);
-            if (fitness < EPSILON) {
+            if (fitness < EPSILON || gen >= GEN_CAP) {
                 break;
             }
         }

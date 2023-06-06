@@ -1,0 +1,21 @@
+seed: 123456789
+40 2 5
+10000 10000
+
+8
+hall 10 0 0
+court 7 0 0
+livingRoom 22 0 0
+masterBedroom 14 0 0
+bedroom1 10 0 0
+bedroom2 10 0 0
+kitchen 8 0 0
+bathroom 5 0 0
+
+hall&court
+hall&livingRoom
+hall&masterBedroom
+hall&bedroom1
+hall&bedroom2
+hall&kitchen
+hall&bathroom

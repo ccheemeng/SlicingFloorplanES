@@ -19,10 +19,13 @@ class Main {
         double y = sc.nextDouble();
         ImList<String> names = new ImList<String>();
         ImList<Double> areas = new ImList<Double>();
+        ImList<Pair<Double>> proportions = new ImList<Pair<Double>>();
         int numOfRooms = sc.nextInt();
         for (int i = 0; i < numOfRooms; ++i) {
             names = names.add(sc.next());
             areas = areas.add(sc.nextDouble());
+            proportions = proportions.add(new Pair<Double>(
+                        sc.nextDouble(), sc.nextDouble()));
         }
         ImList<Pair<String>> adjacencies = new ImList<Pair<String>>();
         String adjacency = "";
@@ -30,6 +33,9 @@ class Main {
         String room2 = "";
         while (sc.hasNext()) {
             adjacency = sc.next();
+            if (adjacency.equals("d")) {
+                break;
+            }
             String[] rooms = adjacency.split("&");
             room1 = rooms[0];
             room2 = rooms[1];
@@ -37,17 +43,8 @@ class Main {
         }
         sc.close();
         Simulator simulator = new Simulator(seed, mu, lambda, tournamentSize,
-                x, y, names, areas, adjacencies);
+                x, y, names, areas, adjacencies, proportions);
         ImList<RoomPos> rooms = simulator.evolve();
-        String output = new Visualiser().visualise(rooms);
-        try {
-            File file = new File("output.out");
-            FileWriter fileWriter = new FileWriter(file);
-            file.createNewFile();
-            fileWriter.write(output);
-            fileWriter.close();
-        } catch (IOException e) {
-            System.out.println("could not write output");
-        }
+        Visualiser.visualise(rooms);
     }
 }

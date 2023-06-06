@@ -12,11 +12,12 @@ class Simulator {
     private final ImList<String> names;
     private final ImList<Double> areas;
     private final ImList<Pair<String>> adjacencies;
+    private final ImList<Pair<Double>> proportions;
     private static final double EPSILON = 1E-15;
 
     Simulator(long seed, int mu, int lambda, int tournamentSize,
-            double x, double y, ImList<String> names,
-            ImList<Double> areas, ImList<Pair<String>> adjacencies) {
+            double x, double y, ImList<String> names, ImList<Double> areas,
+            ImList<Pair<String>> adjacencies, ImList<Pair<Double>> proportions) {
         this.seed = seed;
         this.mu = mu;
         this.lambda = lambda;
@@ -26,6 +27,7 @@ class Simulator {
         this.names = names;
         this.areas = areas;
         this.adjacencies = adjacencies;
+        this.proportions = proportions;
     }
 
     ImList<RoomPos> evolve() {
@@ -96,6 +98,10 @@ class Simulator {
     }
 
     private double cost(ImList<RoomPos> rooms) {
+        return distanceCost(rooms) + proportionCost(rooms);
+    }
+
+    private double distanceCost(ImList<RoomPos> rooms) {
         double distances = 0;
         int numOfAdjacencies = this.adjacencies.size();
         if (numOfAdjacencies <= 0) {
@@ -125,6 +131,34 @@ class Simulator {
             distances += graph.distance(start, end) - 1;
         }
         return distances / numOfAdjacencies;
+    }
+
+    private double proportionCost(ImList<RoomPos> rooms) {
+        double costs = 0;
+        ImList<Integer> ids = new ImList<Integer>();
+        for (RoomPos room : rooms) {
+            ids = ids.add(this.names.indexOf(room.getId()));
+        }
+        for (int i = 0; i < this.proportions.size(); ++i) {
+            Pair<Double> proportion = this.proportions.get(i);
+            RoomPos room = rooms.get(ids.indexOf(i));
+            double x = proportion.first();
+            double y = proportion.second();
+            if (x == 0 || y == 0) {
+                continue;
+            }
+            double roomX = room.getX();
+            double roomY = room.getY();
+            double roomArea = roomX * roomY;
+            double totalArea = this.x * this.y;
+            double cost = ((totalArea - roomArea) / totalArea) *
+                (Math.min(Math.max((x / y) / (roomY / roomX),
+                    (roomY / roomX) / (x / y)),
+                  Math.max((x / y) / (roomX / roomY),
+                    (roomX / roomY) / (x / y))) - 1);
+            costs += cost;
+        }
+        return costs / rooms.size();
     }
 
     private ImList<String> startPolExpr() {
