@@ -36,15 +36,6 @@ class Main {
             adjacencies = adjacencies.add(new Pair<String>(room1, room2));
         }
         sc.close();
-        System.out.println("seed:" + seed +
-                "mu:" + mu +
-                "lambda:" + lambda +
-                "tournamentSize:" + tournamentSize +
-                "x:" + x +
-                "y:" + y +
-                "names:" + names +
-                "areas:" + areas +
-                "adjacencies" + adjacencies);
         Simulator simulator = new Simulator(seed, mu, lambda, tournamentSize,
                 x, y, names, areas, adjacencies);
         ImList<RoomPos> rooms = simulator.evolve();
