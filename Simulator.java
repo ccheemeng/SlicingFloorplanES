@@ -1,4 +1,3 @@
-import java.util.Optional;
 import java.util.Random;
 import java.util.Comparator;
 import java.util.function.Function;
@@ -48,12 +47,6 @@ class Simulator {
             }
         }
         return polExprToRoom(individual).construct(this.x, this.y, this.names);
-        /**
-        ImList<String> polExpr = startPolExpr();
-        System.out.println(polExpr);
-        Room room = polExprToRoom(polExpr);
-        ImList<RoomPos> rooms = room.construct(x, y, this.names);
-        return rooms;**/
     }
 
     private Function<ImList<ImList<String>>, Pair<ImList<String>>> selector() {
