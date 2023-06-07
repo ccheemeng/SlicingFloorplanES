@@ -103,25 +103,32 @@ Connection parameters
 
 ---------- EXAMPLE INPUT ----------
 seed: 314
-40 2 5
-10000 10000
-8
+35 7 5
+13000 8000
+11
 
-1 1 1
+1 0 1
 
-hall 10 0 0 false 0 0
-court 7 0 0 false 0 0
-livingRoom 22 0 0 true 5000 0
-masterBedroom 14 0 0 false 0 0
-bedroom1 10 0 0 false 0 0
-bedroom2 10 0 0 false 0 0
-kitchen 8 0 0 false 0 0
-bathroom 5 1 1 false 0 0
+livingA 11 0 0 false 0 0
+livingB 8 0 0 false 0 0
+entry 4 2 3 true 6500 0
+dining 10 0 0 false 0 0
+kitchen 10 0 0 false 0 0
+eating 10 0 0 false 0 0
+hallway 5 0 0 false 0 0
+mBedroom 10 0 0 true 0 8000
+mBathroom 4 1 1 false 0 0
+bedroom 10 0 0 true 13000 8000
+bathroom 4 1 1 false 0 0
 
-hall&court
-hall&livingRoom
-hall&masterBedroom
-hall&bedroom1
-hall&bedroom2
-hall&kitchen
-hall&bathroom
+entry&livingB
+livingA&livingB
+livingB&dining
+livingA&eating
+livingA&hallway
+dining&kitchen
+eating&kitchen
+hallway&bedroom
+hallway&bathroom
+hallway&mBedroom
+mBedroom&mBathroom

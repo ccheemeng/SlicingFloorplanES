@@ -36,14 +36,13 @@ class Main {
             pos = pos.add(new Pair<Double>(
                         sc.nextDouble(), sc.nextDouble()));
         }
-        System.out.println(names + " " + areas + " " + proportions + " " + pos);
         ImList<Pair<String>> adjacencies = new ImList<Pair<String>>();
         String adjacency = "";
         String room1 = "";
         String room2 = "";
         while (sc.hasNext()) {
             adjacency = sc.next();
-            if (adjacency.contains("&")) {
+            if (!adjacency.contains("&")) {
                 break;
             }
             String[] rooms = adjacency.split("&");
