@@ -13,11 +13,18 @@ class Simulator {
     private final ImList<Double> areas;
     private final ImList<Pair<String>> adjacencies;
     private final ImList<Pair<Double>> proportions;
+    private final ImList<Boolean> careAboutPos;
+    private final ImList<Pair<Double>> pos;
+    private final int distanceScale;
+    private final int proportionScale;
+    private final int posScale;
     private static final double EPSILON = 1E-15;
 
     Simulator(long seed, int mu, int lambda, int tournamentSize,
             double x, double y, ImList<String> names, ImList<Double> areas,
-            ImList<Pair<String>> adjacencies, ImList<Pair<Double>> proportions) {
+            ImList<Pair<String>> adjacencies, ImList<Pair<Double>> proportions,
+            ImList<Boolean> careAboutPos, ImList<Pair<Double>> pos,
+            int distanceScale, int proportionScale, int posScale) {
         this.seed = seed;
         this.mu = mu;
         this.lambda = lambda;
@@ -28,6 +35,11 @@ class Simulator {
         this.areas = areas;
         this.adjacencies = adjacencies;
         this.proportions = proportions;
+        this.careAboutPos = careAboutPos;
+        this.pos = pos;
+        this.distanceScale = distanceScale;
+        this.proportionScale = proportionScale;
+        this.posScale = posScale;
     }
 
     ImList<RoomPos> evolve() {
@@ -43,7 +55,7 @@ class Simulator {
         double fitness = Double.POSITIVE_INFINITY;
         for (ImList<String> polExpr : population) {
             double newFitness = evaluator().apply(polExpr);
-            if (newFitness - fitness < EPSILON) {
+            if (newFitness - fitness < -EPSILON) {
                 fitness = newFitness;
                 individual = polExpr;
             }
@@ -98,7 +110,14 @@ class Simulator {
     }
 
     private double cost(ImList<RoomPos> rooms) {
-        return distanceCost(rooms) + proportionCost(rooms);
+        double total = this.distanceScale + this.proportionScale + this.posScale;
+        if (total == 0) {
+            return 0.0;
+        }
+        double output = (this.distanceScale / total) * distanceCost(rooms) +
+            (this.proportionScale / total) * proportionCost(rooms) +
+            (this.posScale / total) * posCost(rooms);
+        return output;
     }
 
     private double distanceCost(ImList<RoomPos> rooms) {
@@ -159,6 +178,31 @@ class Simulator {
             costs += cost;
         }
         return costs / rooms.size();
+    }
+
+    private double posCost(ImList<RoomPos> rooms) {
+        double costs = 0.0;
+        int total = 0;
+        ImList<Integer> ids = new ImList<Integer>();
+        for (RoomPos room : rooms) {
+            ids = ids.add(this.names.indexOf(room.getId()));
+        }
+        double max = Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
+        for (int i = 0; i < this.pos.size(); ++i) {
+            boolean care = this.careAboutPos.get(i);
+            if (!care) {
+                continue;
+            }
+            Pair<Double> pos = this.pos.get(i);
+            RoomPos room = rooms.get(ids.indexOf(i));
+            double cost = room.distanceOf(pos) / max;
+            costs += cost;
+            ++total;
+        }
+        if (total == 0) {
+            return 0.0;
+        }
+        return costs / total;
     }
 
     private ImList<String> startPolExpr() {

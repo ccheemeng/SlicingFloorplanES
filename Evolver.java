@@ -63,7 +63,7 @@ class Evolver<T> {
             } else {
                 ++gensWithoutImprovement;
             }
-            if (newFitness - bestFitness < EPSILON) {
+            if (newFitness - bestFitness < -EPSILON) {
                 bestPop = newPop;
             }
             pop = newPop;
@@ -81,10 +81,12 @@ class Evolver<T> {
 
     private double fitness(ImList<T> population) {
         double fitness = Double.POSITIVE_INFINITY;
+        T best = population.get(0);
         for (T t : population) {
             double newFitness = this.evaluator.apply(t);
-            if (newFitness - fitness < EPSILON) {
+            if (newFitness - fitness < -EPSILON) {
                 fitness = newFitness;
+                best = t;
             }
         }
         return fitness;

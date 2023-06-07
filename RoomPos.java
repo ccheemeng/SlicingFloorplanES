@@ -1,5 +1,6 @@
 class RoomPos {
-    private static final double EPSILON = 1E-4;
+    private static final double THRESHOLD = 1E-4;
+    private static final double EPSILON = 1E-15;
     private final String id;
     private final double x;
     private final double y;
@@ -27,35 +28,45 @@ class RoomPos {
         double right2 = left2 + other.x;
         double bot2 = other.pos.second();
         double top2 = bot2 + other.y;
-        boolean horIntersect = ((bot1 - EPSILON < bot2) &&
-                 (top1 + EPSILON > bot2)) ||
-                ((bot1 - EPSILON < top2) &&
-                 (top1 + EPSILON > top2)) ||
-                ((bot2 - EPSILON < bot1) &&
-                 (top2 + EPSILON > bot1)) ||
-                ((bot2 - EPSILON < top1) &&
-                 (top2 + EPSILON > top1));
-        boolean verIntersect = ((left1 - EPSILON < left2) &&
-                 (right1 + EPSILON > left2)) ||
-                ((left1 - EPSILON < right2) &&
-                 (right1 + EPSILON > right2)) ||
-                ((left2 - EPSILON < left1) &&
-                 (right2 + EPSILON > left1)) ||
-                ((left2 - EPSILON < right1) &&
-                 (right2 + EPSILON > right1));
+        boolean horIntersect = ((bot1 - THRESHOLD < bot2) &&
+                 (top1 + THRESHOLD > bot2)) ||
+                ((bot1 - THRESHOLD < top2) &&
+                 (top1 + THRESHOLD > top2)) ||
+                ((bot2 - THRESHOLD < bot1) &&
+                 (top2 + THRESHOLD > bot1)) ||
+                ((bot2 - THRESHOLD < top1) &&
+                 (top2 + THRESHOLD > top1));
+        boolean verIntersect = ((left1 - THRESHOLD < left2) &&
+                 (right1 + THRESHOLD > left2)) ||
+                ((left1 - THRESHOLD < right2) &&
+                 (right1 + THRESHOLD > right2)) ||
+                ((left2 - THRESHOLD < left1) &&
+                 (right2 + THRESHOLD > left1)) ||
+                ((left2 - THRESHOLD < right1) &&
+                 (right2 + THRESHOLD > right1));
         return horIntersect && verIntersect;
     }
 
-    private boolean doubleEquals(double d1, double d2) {
-        return Math.abs(d1 - d2) < EPSILON;
-    }
-
-    private boolean doubleLessThanEquals(double d1, double d2) {
-        return d1 - d2 < EPSILON;
-    }
-
-    private boolean doubleMoreThan(double d1, double d2) {
-        return d1 - d2 > EPSILON;
+    double distanceOf(Pair<Double> pt) {
+        double left = this.pos.first();
+        double right = left + this.x;
+        double bot = this.pos.second();
+        double top = bot + this.y;
+        double x = pt.first();
+        double y = pt.second();
+        double horDiff = 0.0;
+        double verDiff = 0.0;
+        if (x - left < -EPSILON) {
+            horDiff = x - left;
+        } else if (x - right > EPSILON) {
+            horDiff = x - right;
+        }
+        if (y - bot < -EPSILON) {
+            verDiff = y - bot;
+        } else if (y - top > EPSILON) {
+            verDiff = y - top;
+        }
+        return Math.sqrt(Math.pow(horDiff, 2) + Math.pow(verDiff, 2));
     }
 
     String getId() {

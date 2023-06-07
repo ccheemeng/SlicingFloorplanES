@@ -20,20 +20,30 @@ class Main {
         ImList<String> names = new ImList<String>();
         ImList<Double> areas = new ImList<Double>();
         ImList<Pair<Double>> proportions = new ImList<Pair<Double>>();
+        ImList<Boolean> careAboutPos = new ImList<Boolean>();
+        ImList<Pair<Double>> pos = new ImList<Pair<Double>>();
         int numOfRooms = sc.nextInt();
+        int distanceScale = sc.nextInt();
+        int proportionScale = sc.nextInt();
+        int posScale = sc.nextInt();
         for (int i = 0; i < numOfRooms; ++i) {
             names = names.add(sc.next());
             areas = areas.add(sc.nextDouble());
             proportions = proportions.add(new Pair<Double>(
                         sc.nextDouble(), sc.nextDouble()));
+            careAboutPos = careAboutPos.add(
+                    Boolean.parseBoolean(sc.next()));
+            pos = pos.add(new Pair<Double>(
+                        sc.nextDouble(), sc.nextDouble()));
         }
+        System.out.println(names + " " + areas + " " + proportions + " " + pos);
         ImList<Pair<String>> adjacencies = new ImList<Pair<String>>();
         String adjacency = "";
         String room1 = "";
         String room2 = "";
         while (sc.hasNext()) {
             adjacency = sc.next();
-            if (adjacency.equals("d")) {
+            if (adjacency.contains("&")) {
                 break;
             }
             String[] rooms = adjacency.split("&");
@@ -43,7 +53,8 @@ class Main {
         }
         sc.close();
         Simulator simulator = new Simulator(seed, mu, lambda, tournamentSize,
-                x, y, names, areas, adjacencies, proportions);
+                x, y, names, areas, adjacencies, proportions, careAboutPos, pos,
+                distanceScale, proportionScale, posScale);
         ImList<RoomPos> rooms = simulator.evolve();
         Visualiser.visualise(rooms);
     }
