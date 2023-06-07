@@ -11,10 +11,10 @@ class Simulator {
     private final double y;
     private final ImList<String> names;
     private final ImList<Double> areas;
-    private final ImList<Pair<String>> adjacencies;
-    private final ImList<Pair<Double>> proportions;
+    private final ImList<Twin<String>> adjacencies;
+    private final ImList<Twin<Double>> proportions;
     private final ImList<Boolean> careAboutPos;
-    private final ImList<Pair<Double>> pos;
+    private final ImList<Twin<Double>> pos;
     private final int distanceScale;
     private final int proportionScale;
     private final int posScale;
@@ -22,8 +22,8 @@ class Simulator {
 
     Simulator(long seed, int mu, int lambda, int tournamentSize,
             double x, double y, ImList<String> names, ImList<Double> areas,
-            ImList<Pair<String>> adjacencies, ImList<Pair<Double>> proportions,
-            ImList<Boolean> careAboutPos, ImList<Pair<Double>> pos,
+            ImList<Twin<String>> adjacencies, ImList<Twin<Double>> proportions,
+            ImList<Boolean> careAboutPos, ImList<Twin<Double>> pos,
             int distanceScale, int proportionScale, int posScale) {
         this.seed = seed;
         this.mu = mu;
@@ -50,20 +50,12 @@ class Simulator {
         Evolver<ImList<String>> evolver = new Evolver<ImList<String>>(
                 this.seed, this.mu, this.lambda,
                 selector(), mutator(), crossover(), evaluator());
-        population = evolver.evolve(population);
-        ImList<String> individual = new ImList<String>();
-        double fitness = Double.POSITIVE_INFINITY;
-        for (ImList<String> polExpr : population) {
-            double newFitness = evaluator().apply(polExpr);
-            if (newFitness - fitness < -EPSILON) {
-                fitness = newFitness;
-                individual = polExpr;
-            }
-        }
+        Pair<ImList<String>, Double> output = evolver.evolve(population);
+        ImList<String> individual = output.first();
         return polExprToRoom(individual).construct(this.x, this.y, this.names);
     }
 
-    private Function<ImList<ImList<String>>, Pair<ImList<String>>> selector() {
+    private Function<ImList<ImList<String>>, Twin<ImList<String>>> selector() {
         return pop -> {
             ImList<ImList<String>> parents = new ImList<ImList<String>>();
             for (int i = 0; i < 2; ++i) {
@@ -92,7 +84,7 @@ class Simulator {
                 ImList<ImList<String>> sorted = sample.sort(cmp);
                 parents = parents.add(sorted.get(0));
             }
-            return new Pair<ImList<String>>(parents.get(0), parents.get(1));
+            return new Twin<ImList<String>>(parents.get(0), parents.get(1));
         };
     }
 
@@ -100,7 +92,7 @@ class Simulator {
         return individual -> PolExpr.randomMove(individual);
     }
 
-    private Function<Pair<ImList<String>>, ImList<String>> crossover() {
+    private Function<Twin<ImList<String>>, ImList<String>> crossover() {
         return parents -> PolExpr.ccx(parents.first(), parents.second());
     }
 
@@ -130,10 +122,10 @@ class Simulator {
         for (RoomPos room : rooms) {
             ids = ids.add(room.getId());
         }
-        ImList<Pair<Integer>> indexedAdjacencies = new ImList<Pair<Integer>>();
-        for (Pair<String> adjacency : this.adjacencies) {
+        ImList<Twin<Integer>> indexedAdjacencies = new ImList<Twin<Integer>>();
+        for (Twin<String> adjacency : this.adjacencies) {
             indexedAdjacencies = indexedAdjacencies.add(
-                    new Pair<Integer>(ids.indexOf(adjacency.first()),
+                    new Twin<Integer>(ids.indexOf(adjacency.first()),
                         ids.indexOf(adjacency.second())));
         }
         Graph graph = new Graph(rooms.size());
@@ -144,7 +136,7 @@ class Simulator {
                 }
             }
         }
-        for (Pair<Integer> adjacency : indexedAdjacencies) {
+        for (Twin<Integer> adjacency : indexedAdjacencies) {
             int start = adjacency.first();
             int end = adjacency.second();
             distances += graph.distance(start, end) - 1;
@@ -159,7 +151,7 @@ class Simulator {
             ids = ids.add(this.names.indexOf(room.getId()));
         }
         for (int i = 0; i < this.proportions.size(); ++i) {
-            Pair<Double> proportion = this.proportions.get(i);
+            Twin<Double> proportion = this.proportions.get(i);
             RoomPos room = rooms.get(ids.indexOf(i));
             double x = proportion.first();
             double y = proportion.second();
@@ -193,7 +185,7 @@ class Simulator {
             if (!care) {
                 continue;
             }
-            Pair<Double> pos = this.pos.get(i);
+            Twin<Double> pos = this.pos.get(i);
             RoomPos room = rooms.get(ids.indexOf(i));
             double cost = room.distanceOf(pos) / max;
             costs += cost;

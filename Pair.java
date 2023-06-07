@@ -1,30 +1,54 @@
 /**
- * This utility class stores two items of the same type together in a pair.
- * It could be used, for instance, to faciliate returning of two values in a function.
+ * This utility class stores two items together in a pair.
+ * It could be used, for instance, to faciliate returning of
+ * two values in a function.
  *
- * derived from
  * @author cs2030
- * @param <T> the type of the items
+ * @param <T> the type of the first element
+ * @param <U> the type of the second element
  **/
-public class Pair<T> {
-    private final T t1;
-    private final T t2;
+public class Pair<T, U> {
+    private final T t;
+    private final U u;
 
-    public Pair(T t1, T t2) {
-        this.t1 = t1;
-        this.t2 = t2;
+    /**
+     * Creates a {@code Pair} of items.
+     *
+     * @param t first item of the pair
+     * @param u second item of the pair
+     **/
+    public Pair(T t, U u) {
+        this.t = t;
+        this.u = u;
     }
 
+    /**
+     * Returns the first item of the pair.
+     *
+     * @return the first item of the pair
+     */
     public T first() {
-        return this.t1;
+        return this.t;
     }
 
-    public T second() {
-        return this.t2;
+    /**
+     * Returns the second item of the pair.
+     *
+     * @return the second item of the pair
+     */
+    public U second() {
+        return this.u;
     }
 
+    /**
+     * Returns a string representation of this pair enclosed in ({@code "()"}).  
+     * The two elements are separated by the characters {@code ", "} (comma and space).
+     * Elements are converted to strings as by {@link String#valueOf(Object)}.
+     *
+     * @return a string representation of this list
+     */
     @Override
     public String toString() {
-        return "(" + this.t1 + ", " + this.t2 + ")";
+        return "(" + this.t + ", " + this.u + ")";
     }
 }

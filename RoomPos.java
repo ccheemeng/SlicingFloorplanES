@@ -4,9 +4,9 @@ class RoomPos {
     private final String id;
     private final double x;
     private final double y;
-    private final Pair<Double> pos;
+    private final Twin<Double> pos;
 
-    RoomPos(String id, double x, double y, Pair<Double> pos) {
+    RoomPos(String id, double x, double y, Twin<Double> pos) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -47,7 +47,7 @@ class RoomPos {
         return horIntersect && verIntersect;
     }
 
-    double distanceOf(Pair<Double> pt) {
+    double distanceOf(Twin<Double> pt) {
         double left = this.pos.first();
         double right = left + this.x;
         double bot = this.pos.second();
@@ -81,7 +81,7 @@ class RoomPos {
         return this.y;
     }
 
-    Pair<Double> getPos() {
+    Twin<Double> getPos() {
         return this.pos;
     }
 }

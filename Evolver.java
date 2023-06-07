@@ -5,9 +5,9 @@ class Evolver<T> {
     private final long seed;
     private final int mu;
     private final int lambda;
-    private final Function<ImList<T>, Pair<T>> selector;
+    private final Function<ImList<T>, Twin<T>> selector;
     private final Function<T, T> mutator;
-    private final Function<Pair<T>, T> crossover;
+    private final Function<Twin<T>, T> crossover;
     private final Function<T, Double> evaluator;
     private static final double EPSILON = 1E-9;
     private static final double GEN_CAP = 50000;
@@ -15,8 +15,8 @@ class Evolver<T> {
     private static final double MUTATION_PROB = 0.9;
 
     Evolver(long seed, int mu, int lambda,
-            Function<ImList<T>, Pair<T>> selector, Function<T,T> mutator,
-            Function<Pair<T>, T> crossover, Function<T, Double> evaluator) {
+            Function<ImList<T>, Twin<T>> selector, Function<T,T> mutator,
+            Function<Twin<T>, T> crossover, Function<T, Double> evaluator) {
         this.seed = seed;
         this.mu = mu;
         this.lambda = lambda;
@@ -26,12 +26,13 @@ class Evolver<T> {
         this.evaluator = evaluator;
     }
 
-    ImList<T> evolve(ImList<T> startPop) {
+    Pair<T, Double> evolve(ImList<T> startPop) {
+        T best = startPop.get(0);
         int gen = 0;
         Random r = new Random(this.seed);
         ImList<T> pop = startPop;
         ImList<T> bestPop = pop;
-        double fitness = fitness(pop);
+        double fitness = fitness(pop).second();
         double newFitness = fitness;
         double bestFitness = fitness;
         int gensWithoutImprovement = 0;
@@ -39,13 +40,13 @@ class Evolver<T> {
             ImList<T> children = new ImList<T>();
             ImList<T> selectedParents = pop;
             for (int i = 0; i < this.lambda; ++i) {
-                Pair<T> parents = this.selector.apply(pop);
+                Twin<T> parents = this.selector.apply(pop);
                 if (r.nextDouble() - MUTATION_PROB < -EPSILON) {
-                    parents = new Pair<T>(this.mutator.apply(parents.first()),
+                    parents = new Twin<T>(this.mutator.apply(parents.first()),
                             parents.second());
                 }
                 if (r.nextDouble() - MUTATION_PROB < -EPSILON) {
-                    parents = new Pair<T>(parents.first(),
+                    parents = new Twin<T>(parents.first(),
                             this.mutator.apply(parents.second()));
                 }
                 T child = this.crossover.apply(parents);
@@ -57,7 +58,9 @@ class Evolver<T> {
             for (T child : children) {
                 newPop = newPop.add(child);
             }
-            newFitness = fitness(newPop);
+            Pair<T, Double> output = fitness(newPop);
+            T newBest = output.first();
+            newFitness = output.second();
             if (newFitness - fitness < -EPSILON) {
                 gensWithoutImprovement = 0;
             } else {
@@ -65,6 +68,7 @@ class Evolver<T> {
             }
             if (newFitness - bestFitness < -EPSILON) {
                 bestPop = newPop;
+                best = newBest;
             }
             pop = newPop;
             fitness = newFitness;
@@ -76,10 +80,10 @@ class Evolver<T> {
                 break;
             }
         }
-        return bestPop;
+        return new Pair<T, Double>(best, fitness);
     }
 
-    private double fitness(ImList<T> population) {
+    private Pair<T, Double> fitness(ImList<T> population) {
         double fitness = Double.POSITIVE_INFINITY;
         T best = population.get(0);
         for (T t : population) {
@@ -89,6 +93,6 @@ class Evolver<T> {
                 best = t;
             }
         }
-        return fitness;
+        return new Pair<T, Double>(best, fitness);
     }
 }
