@@ -48,7 +48,7 @@ class Simulator {
             population = population.add(startPolExpr());
         }
         Evolver<ImList<String>> evolver = new Evolver<ImList<String>>(
-                r.nextLong(), this.lambda,
+                this.r.nextLong(), this.lambda,
                 selector(), mutator(), crossover(), evaluator());
         Pair<ImList<String>, Double> output = evolver.evolve(population);
         ImList<String> individual = output.first();
@@ -88,7 +88,7 @@ class Simulator {
     }
 
     private Function<ImList<String>, ImList<String>> mutator() {
-        return individual -> PolExpr.randomMove(individual, r.nextLong());
+        return individual -> PolExpr.randomMove(individual, this.r.nextLong());
     }
 
     private Function<Twin<ImList<String>>, ImList<String>> crossover() {
