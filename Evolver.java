@@ -2,8 +2,7 @@ import java.util.function.Function;
 import java.util.Random;
 
 class Evolver<T> {
-    private final long seed;
-    private final int mu;
+    private final Random r;
     private final int lambda;
     private final Function<ImList<T>, Twin<T>> selector;
     private final Function<T, T> mutator;
@@ -14,11 +13,10 @@ class Evolver<T> {
     private static final int GENS_WITHOUT_IMPROVEMENT = 7500;
     private static final double MUTATION_PROB = 0.9;
 
-    Evolver(long seed, int mu, int lambda,
+    Evolver(long seed, int lambda,
             Function<ImList<T>, Twin<T>> selector, Function<T,T> mutator,
             Function<Twin<T>, T> crossover, Function<T, Double> evaluator) {
-        this.seed = seed;
-        this.mu = mu;
+        this.r = new Random(seed);
         this.lambda = lambda;
         this.selector = selector;
         this.mutator = mutator;
@@ -29,7 +27,6 @@ class Evolver<T> {
     Pair<T, Double> evolve(ImList<T> startPop) {
         T best = startPop.get(0);
         int gen = 0;
-        Random r = new Random(this.seed);
         ImList<T> pop = startPop;
         ImList<T> bestPop = pop;
         double fitness = fitness(pop).second();
@@ -41,18 +38,18 @@ class Evolver<T> {
             ImList<T> selectedParents = pop;
             for (int i = 0; i < this.lambda; ++i) {
                 Twin<T> parents = this.selector.apply(pop);
-                if (r.nextDouble() - MUTATION_PROB < -EPSILON) {
+                if (this.r.nextDouble() - MUTATION_PROB < -EPSILON) {
                     parents = new Twin<T>(this.mutator.apply(parents.first()),
                             parents.second());
                 }
-                if (r.nextDouble() - MUTATION_PROB < -EPSILON) {
+                if (this.r.nextDouble() - MUTATION_PROB < -EPSILON) {
                     parents = new Twin<T>(parents.first(),
                             this.mutator.apply(parents.second()));
                 }
                 T child = this.crossover.apply(parents);
                 children = children.add(child);
                 selectedParents = selectedParents.remove(
-                        r.nextInt(selectedParents.size()));
+                        this.r.nextInt(selectedParents.size()));
             }
             ImList<T> newPop = selectedParents;
             for (T child : children) {

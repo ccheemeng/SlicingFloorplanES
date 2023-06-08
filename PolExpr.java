@@ -3,7 +3,7 @@ import java.util.Random;
 class PolExpr {
     private static final int LIMIT = 100;
 
-    public static ImList<String> moveOne(ImList<String> polExpr) {
+    public static ImList<String> moveOne(ImList<String> polExpr, long seed) {
         ImList<String> newPolExpr = polExpr;
         int lastOperandIndex = -1;
         for (int i = polExpr.size() - 1; i >= 0; i--) {
@@ -13,7 +13,7 @@ class PolExpr {
             }
         }
         int i = 0;
-        Random r = new Random();
+        Random r = new Random(seed);
         while (i < LIMIT) {
             int j = r.nextInt(lastOperandIndex);
             String operand1 = polExpr.get(j);
@@ -31,10 +31,10 @@ class PolExpr {
         return newPolExpr;
     }
 
-    public static ImList<String> moveTwo(ImList<String> polExpr) {
+    public static ImList<String> moveTwo(ImList<String> polExpr, long seed) {
         ImList<String> newPolExpr = polExpr;
         int i = 0;
-        Random r = new Random();
+        Random r = new Random(seed);
         while (i < LIMIT) {
             int j = r.nextInt(polExpr.size());
             String operator = polExpr.get(j);
@@ -62,12 +62,12 @@ class PolExpr {
         return newPolExpr;
     }
 
-    public static ImList<String> moveThree(ImList<String> polExpr, ImList<Integer> indices) {
+    public static ImList<String> moveThree(ImList<String> polExpr, ImList<Integer> indices, long seed) {
         if (indices.isEmpty()) {
             System.out.println("Warning! M3 attempted on invalid Polish expression. Returning original expression.");
             return polExpr;
         }
-        int i = new Random().nextInt(indices.size());
+        int i = new Random(seed).nextInt(indices.size());
         int index = indices.get(i);
         String e1 = polExpr.get(index);
         String e2 = polExpr.get(index + 1);
@@ -96,22 +96,22 @@ class PolExpr {
         return indices;
     }
 
-    public static ImList<String> randomMove(ImList<String> polExpr) {
+    public static ImList<String> randomMove(ImList<String> polExpr, long seed) {
         ImList<String> newPolExpr = polExpr;
-        Random r = new Random();
+        Random r = new Random(seed);
         int move = r.nextInt(3) + 1;
         if (move == 3) {
             ImList<Integer> moveThreeIndices = PolExpr.moveThreeIndices(polExpr);
             if (!moveThreeIndices.isEmpty()) {
-                newPolExpr = PolExpr.moveThree(polExpr, moveThreeIndices);
+                newPolExpr = PolExpr.moveThree(polExpr, moveThreeIndices, seed);
             } else {
                 move = r.nextInt(2) + 1;
             }
         }
         if (move == 1) {
-            newPolExpr = PolExpr.moveOne(polExpr);
+            newPolExpr = PolExpr.moveOne(polExpr, seed);
         } else if (move == 2) {
-            newPolExpr = PolExpr.moveTwo(polExpr);
+            newPolExpr = PolExpr.moveTwo(polExpr, seed);
         }
         return newPolExpr;
     }

@@ -3,7 +3,7 @@ import java.util.Comparator;
 import java.util.function.Function;
 
 class Simulator {
-    private final long seed;
+    private final Random r;
     private final int mu;
     private final int lambda;
     private final int tournamentSize;
@@ -25,7 +25,7 @@ class Simulator {
             ImList<Twin<String>> adjacencies, ImList<Twin<Double>> proportions,
             ImList<Boolean> careAboutPos, ImList<Twin<Double>> pos,
             int distanceScale, int proportionScale, int posScale) {
-        this.seed = seed;
+        this.r = new Random(seed);
         this.mu = mu;
         this.lambda = lambda;
         this.tournamentSize = tournamentSize;
@@ -48,7 +48,7 @@ class Simulator {
             population = population.add(startPolExpr());
         }
         Evolver<ImList<String>> evolver = new Evolver<ImList<String>>(
-                this.seed, this.mu, this.lambda,
+                r.nextLong(), this.lambda,
                 selector(), mutator(), crossover(), evaluator());
         Pair<ImList<String>, Double> output = evolver.evolve(population);
         ImList<String> individual = output.first();
@@ -61,9 +61,8 @@ class Simulator {
             for (int i = 0; i < 2; ++i) {
                 ImList<ImList<String>> newPop = pop;
                 ImList<ImList<String>> sample = new ImList<ImList<String>>();
-                Random r = new Random(this.seed);
                 for (int j = 0; j < this.tournamentSize; ++j) {
-                    int index = r.nextInt(newPop.size());
+                    int index = this.r.nextInt(newPop.size());
                     sample = sample.add(newPop.get(index));
                     newPop = newPop.remove(index);
                 }
@@ -89,7 +88,7 @@ class Simulator {
     }
 
     private Function<ImList<String>, ImList<String>> mutator() {
-        return individual -> PolExpr.randomMove(individual);
+        return individual -> PolExpr.randomMove(individual, r.nextLong());
     }
 
     private Function<Twin<ImList<String>>, ImList<String>> crossover() {
@@ -203,7 +202,6 @@ class Simulator {
         for (int i = 0; i < numOfOperands; ++i) {
             ids = ids.add(i);
         }
-        Random r = new Random(seed);
         ImList<String> output = new ImList<String>();
         boolean addOperand = false;
         boolean addH = false;
@@ -211,17 +209,17 @@ class Simulator {
         boolean prevV = false;
         int index = -1;
         for (int i = 0; i < 2; ++i) {
-            index = r.nextInt(ids.size());
+            index = this.r.nextInt(ids.size());
             output = output.add(ids.get(index) + "");
             ids = ids.remove(index);
         }
         int operatorsLeft = 1;
         for (int i = 0; i < 2 * numOfOperands - 4; ++i) {
-            addOperand = r.nextBoolean();
-            addH = r.nextBoolean();
+            addOperand = this.r.nextBoolean();
+            addH = this.r.nextBoolean();
             if (operatorsLeft <= 0 ||
                     (addOperand && ids.size() > 0)) {
-                index = r.nextInt(ids.size());
+                index = this.r.nextInt(ids.size());
                 output = output.add(ids.get(index) + "");
                 ids = ids.remove(index);
                 prevH = false;
@@ -239,7 +237,7 @@ class Simulator {
                 --operatorsLeft;
             }
         }
-        addH = r.nextBoolean();
+        addH = this.r.nextBoolean();
         if (prevV || (addH && !prevH)) {
             output = output.add("H");
         } else {

@@ -1,8 +1,5 @@
 import java.util.Scanner;
 import java.util.Random;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 class Main {
     public static void main(String[] args) {
